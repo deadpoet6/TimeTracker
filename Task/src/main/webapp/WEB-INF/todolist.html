@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> TODO LIST</title>
+	<link rel="stylesheet" type="text/css" href="css/style1.css">
+</head>
+<body>
+<div class="search">
+<input type="text" name="search" placeholder="enter the task name"/>
+<input type="submit" value="Search here"/>
+<ul>
+<li><a href="#">Task 1</a></li>
+<li><a href="#">Task 2</a></li>
+<li><a href="#">Task 3</a></li>
+</ul>
+</div>
+<div id="container">
+		<div id="header">
+			<h1>Add task</h1>
+		</div>
+		<div id="inputContainer">
+			<input id="taskInput" type="text" placeholder="Add a task" maxlength="50" />
+		</div>
+		<div id="listWrapper">
+			<ul id="taskList">
+			</ul>
+		</div>
+		<div id="deleteBtnWrapper" >
+			<button id="deleteCompletedBtn" onclick="deleteCompleted()">finish</button>
+			<button id="clearTasksBtn" onclick="deleteAll()">delete</button>
+		</div>
+	</div>
+<script src="js/todo.js"></script>
+</body>
+</html>
