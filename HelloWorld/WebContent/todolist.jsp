@@ -1,36 +1,26 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
     
-<%@ page import="java.net.*,java.io.*"%>    
+<%@ page import="java.net.*,java.io.*"%>  
+<%@ page import="request.Curl" %>
 
 
 <% 
-out.println("Ikram : getting access token");
 
-try{ 
-Runtime r = Runtime.getRuntime(); 
-String mycurl = "curl.exe -e http://www.ffiec.gov/geocode/default.htm -v www.ffiec.gov/geocode/GeocodeSearchmapping.htm"; 
-Process p = r.exec(mycurl); 
-InputStream is = p.getInputStream(); 
-StringBuffer buf=new StringBuffer(); 
-ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(); 
-int readByte = -1; 
-while ((readByte = is.read()) > -1) { 
-buf.append((char)readByte); 
-} 
-String mybuf = buf.toString(); 
-out.println(mybuf); 
-}catch(Exception e){ 
-out.println(e.getMessage());
-}
-
-/*
+out.println("Ikram : getting access token on server");
 
 String access_token = "b240fe68007a1c01b5f6da3e22f4d664cc9d57186fc39ce6a248174356cd";
-      String client_id = "e56693ca9d2c248f275d";
-      String client_secret = "e2fc71d1d58679cc27b4f46ae6b4f2399519e9fdc8c99253531e186bd17b";
-      String code = "6b172602b36c9a669b83";
-*/
+String client_id = "e56693ca9d2c248f275d";
+String client_secret = "e2fc71d1d58679cc27b4f46ae6b4f2399519e9fdc8c99253531e186bd17b";
+String code = request.getParameter("code");
+
+code="4be18766d47d4d60bfe9";
+Curl curl = new Curl();
+
+out.println(curl.testWunderlistAuthentication(code, client_id, client_secret));
+
+
+
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en">
@@ -47,19 +37,14 @@ String access_token = "b240fe68007a1c01b5f6da3e22f4d664cc9d57186fc39ce6a24817435
 	  var access_token = 'b240fe68007a1c01b5f6da3e22f4d664cc9d57186fc39ce6a248174356cd';
       var client_id = 'e56693ca9d2c248f275d';
       var client_secret = 'e2fc71d1d58679cc27b4f46ae6b4f2399519e9fdc8c99253531e186bd17b';
-      var code = 'b2043e5cdbd9ba7445e6';
+      var code = '<%= request.getParameter("code") %>';
       
 	  $('document').ready(function(){
 		  
+		  
+	      console.log("code" + code);
+		  
 		  /*
-		  $.post('https://www.wunderlist.com/oauth/access_token', {'client_id': client_id, 'client_secret': client_secret, 'code': code}, function(data){
-			  
-			  alert(data);
-			  
-		  }).fail(function(response) {
-			    alert('Ikram Error: ' + response.responseText);
-		  });
-	      */
 	      
 		  var link = 'https://www.wunderlist.com/oauth/access_token';
 		  var req_data = {'client_id': client_id, 'client_secret': client_secret, 'code': code};
@@ -69,8 +54,7 @@ String access_token = "b240fe68007a1c01b5f6da3e22f4d664cc9d57186fc39ce6a24817435
 	            type: 'post',
 	            dataType: 'json',
 	            data: JSON.stringify(req_data),
-	            contentType: 'application/json',
-	            headers: { 'X-Access-Token': access_token, 'X-Client-ID': client_id }
+	            contentType: 'application/json'
 	           
 	            
 	       }).success(function (data) {
@@ -78,16 +62,39 @@ String access_token = "b240fe68007a1c01b5f6da3e22f4d664cc9d57186fc39ce6a24817435
            }).error(function (err) {
               	console.log("error : " + err);
            });
+	      */
 	      
 		  //getAT();
-	      getData();
+	      //getData();
 	      //getParticularData('249470512');
 	      //setData();
 	      
 	      
 	  });
 	 
-	  
+	  function getAT(){
+	 		
+	 		$.ajax({
+		          url: 'https://www.wunderlist.com/oauth/access_token',
+		          method: 'POST',
+		          dataType: 'json',
+		          contentType: 'application/json',
+		          //headers: { 'X-Access-Token': access_token, 'X-Client-ID': client_id},
+		          data: {'client_id': client_id, 'client_secret': client_secret, 'code': code}
+		          
+		      }).success(function(data){
+		         // $("#create_new_task_modal").modal('hide');
+		          //swal("Task created!", "Your task was successfully created!", "success");
+		          console.log(data);
+		         
+		          
+		      }).error(function(data){
+		    	  
+		    	  console.log(data);
+		      });
+		
+	 		
+	 	}
 	  
  	function getData(){
  		
@@ -197,32 +204,7 @@ String access_token = "b240fe68007a1c01b5f6da3e22f4d664cc9d57186fc39ce6a24817435
 	 	}
 	 	
 
-	  function getAT(){
-	 		
-	 		$.ajax({
-		          url: 'https://www.wunderlist.com/oauth/access_token',
-		          method: 'post',
-		          dataType: 'json',
-		          contentType: 'application/json',
-		          headers: { 'X-Access-Token': access_token, 'X-Client-ID': client_id},
-		          data: JSON.stringify({'client_id': client_id, 'client_secret': client_secret, 'code': code})
-		          
-		      }).success(function(data){
-		         // $("#create_new_task_modal").modal('hide');
-		          //swal("Task created!", "Your task was successfully created!", "success");
-		          console.log(data);
-		          
-		          
-		          
-		          
-		          
-		      }).error(function(data){
-		    	  
-		    	  console.log(data);
-		      });
-		
-	 		
-	 	}
+	  
  	
 function setData(){
  		
@@ -248,6 +230,18 @@ function setData(){
 	
  		
  	}
+ 	
+ 	
+ 	function getParameter( name, url ) {
+ 		
+ 	      if (!url) url = location.href;
+ 	      name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+ 	      var regexS = "[\\?&]"+name+"=([^&#]*)";
+ 	      var regex = new RegExp( regexS );
+ 	      var results = regex.exec( url );
+ 	      return results == null ? null : results[1];
+ 	      
+ 	    }
     
    
   });
