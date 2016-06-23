@@ -37,7 +37,7 @@ access_token = (curl.testWunderlistAuthentication(code, client_id, client_secret
 	 <script>
 	  $(function() {
 
-		  var access_token = '<%=access_token %>';
+		  var access_token = 'b240fe68007a1c01b5f6da3e22f4d664cc9d57186fc39ce6a248174356cd';
 	      var client_id = 'e56693ca9d2c248f275d';
 	      var client_secret = 'e2fc71d1d58679cc27b4f46ae6b4f2399519e9fdc8c99253531e186bd17b';
 	      var code = '<%= request.getParameter("code") %>';
