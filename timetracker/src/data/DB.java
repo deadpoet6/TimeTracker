@@ -6,6 +6,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -22,7 +24,7 @@ public class DB {
  
 	public DB(){
 		
-		System.out.println("connecting to db");
+		//System.out.println("connecting to db");
 		 try {
 			Class.forName(dbClass);
 			this.connection = DriverManager.getConnection(dbUrl, username, password);
@@ -35,14 +37,16 @@ public class DB {
 		   
 	}
 	
+	
 	public boolean isRowExist(String query){
 		System.out.println("is existing fun");
 		try {
 
+				System.out.println("isRE: query : " + query);
 				Statement statement = connection.createStatement();
 				ResultSet resultSet = statement.executeQuery(query);
 				
-				System.out.println("result set : " + resultSet.getFetchSize());
+				System.out.println("is exixt result set : " + resultSet.getFetchSize());
 				
 				if(resultSet.next()){
 					this.status = resultSet.getString("status");
@@ -55,7 +59,7 @@ public class DB {
 			e.printStackTrace();
 		}finally{
 			
-			
+		
 		}
 		
 		return false;
@@ -72,7 +76,7 @@ public class DB {
 					//ResultSet resultSet = statement.executeQuery(query);
 					int resultSet = statement.executeUpdate(query);
 					
-					System.out.println("Afected rows :  " + resultSet);
+					//System.out.println("Afected rows :  " + resultSet);
 					
 			}catch (SQLException e) {
 				e.printStackTrace();
@@ -83,36 +87,40 @@ public class DB {
 	}
 	
 	public void addData(String data){
-		System.out.println("add fun");
+		//System.out.println("add fun");
 		
 		String[] rows = data.split(";");
 		String[] columns;
 		String query = "", checkQuery = "";
 		
+		
 		for(int i = 0; i < rows.length; i++){
 			
 			columns = rows[i].split(",");
+			System.out.println("add fun columns : " + columns.toString());
 			checkQuery = "SELECT * FROM fact WHERE user=" + columns[0] + " AND list_id=" + columns[1] + " AND task_id=" + columns[2] + "";
-			System.out.println("Check Query : " + checkQuery);
+			//System.out.println("Check Query : " + checkQuery);
 			
 			if(isRowExist(checkQuery))
 				continue;
 			
-			System.out.println("new data is here");
+			//System.out.println("new data is here");
 			Date date = new Date();
 	        java.sql.Timestamp currentTimeStamp = new java.sql.Timestamp(date.getTime());
 	        
 			query = "INSERT INTO fact VALUES('" + columns[0] + "', '" + columns[1] + "', '" + columns[2] + "', '" + currentTimeStamp + "', 'create', 0)";
 			
-			System.out.println("Add Query : " + query);
+			//System.out.println("Add Query : " + query);
 			executeInsertQuery(query);
+			
+			status = "create";
 		}
 		
 		
 		
 	}
 	
-	public void addFinishData(String data) throws SQLException{
+	public void addFinishData(String data) throws SQLException, ParseException{
 		System.out.println("add finish fun");
 		
 		String[] rows = data.split(";");
@@ -121,14 +129,22 @@ public class DB {
 		
 		for(int i = 0; i < rows.length; i++){
 			
+			System.out.println("addFD row : " + rows[i]);
 			columns = rows[i].split(",");
 			checkQuery = "SELECT * FROM fact WHERE user=" + columns[0] + " AND list_id=" + columns[1] + " AND task_id=" + columns[2] + "";
-			System.out.println("Check Query : " + checkQuery);
+			System.out.println("addFD Check Query : " + checkQuery);
 			
-			if(isFinished(rows[i]))
-				continue;
-			if(isRowExist(checkQuery)){
-				finishTask(rows[i]);
+			boolean exist = isRowExist(checkQuery);
+			
+			System.out.println("exist : " + exist);
+			
+			if(exist){
+				
+				if(isFinished(rows[i]))
+					continue;
+				
+				System.out.println("before finishTaskByWunder : " + rows[i]);
+				finishTaskByWunder(rows[i]);
 				
 				continue;
 			}
@@ -141,6 +157,8 @@ public class DB {
 			
 			System.out.println("Add Query : " + query);
 			executeInsertQuery(query);
+			
+			status = "finish";
 		}
 		
 		
@@ -150,7 +168,7 @@ public class DB {
 	
 	public long refreshTime(String data) throws SQLException{
 		
-		 System.out.println("refrshing");
+		 //System.out.println("refrshing in db data :" + data);
 		
 		String[] rows = data.split(";");
 		String[] columns;
@@ -159,10 +177,12 @@ public class DB {
 		
 		for(int i = 0; i < rows.length; i++){
 			
+			//System.out.println("rows in loop : " + rows[i]);
+			
 			columns = rows[i].split(",");
 			query = "SELECT * FROM fact WHERE user=" + columns[0] + " AND list_id=" + columns[1] + " AND task_id=" + columns[2] + "";
 			
-			 System.out.println("refrsh Query : " +  query);
+			 //System.out.println("refrsh Query : " +  query);
 			 
 			Statement statement = connection.createStatement();
 	        ResultSet resultSet = statement.executeQuery(query);
@@ -175,7 +195,7 @@ public class DB {
 		        Date date = new Date();
 		        java.sql.Timestamp currentTimeStamp = new java.sql.Timestamp(date.getTime());
 		        
-		        System.out.println("before updating refresh");
+		        //System.out.println("before updating refresh");
 		        String updateQuery;
 		        if(status.equals("start")){
 			        totalTime += (currentTimeStamp.getTime() - StartTimeStamp.getTime());
@@ -185,7 +205,7 @@ public class DB {
 		        else
 		        	updateQuery = "UPDATE fact SET total_time=" + totalTime + ", start_time='" + currentTimeStamp + "' WHERE user=" + columns[0] + " AND list_id=" + columns[1] + " AND task_id=" + columns[2] + "";
 		        
-		        System.out.println("refrsh update : " + updateQuery);
+		        //System.out.println("refrsh update : " + updateQuery);
 		        
 		        Statement updateStatement = connection.createStatement();
 				//ResultSet resultSet = statement.executeQuery(query);
@@ -260,7 +280,7 @@ public class DB {
 		        Date date = new Date();
 		        java.sql.Timestamp currentTimeStamp = new java.sql.Timestamp(date.getTime());
 		        
-		        if(!status.equals("pause") && !status.equals("finish")){
+		        if(status.equals("start")){
 		        	totalTime += (currentTimeStamp.getTime() - StartTimeStamp.getTime());
 		        	java.sql.Timestamp updatedStamp = new java.sql.Timestamp(totalTime);
 		        }
@@ -302,7 +322,7 @@ public class DB {
 		        Date date = new Date();
 		        java.sql.Timestamp currentTimeStamp = new java.sql.Timestamp(date.getTime());
 		        
-		        if(status.equals("pause")){
+		        if(status.equals("start")){
 		        	totalTime += (currentTimeStamp.getTime() - StartTimeStamp.getTime());
 		        	java.sql.Timestamp updatedStamp = new java.sql.Timestamp(totalTime);
 		        }
@@ -323,7 +343,7 @@ public class DB {
 	}
 	
 	
-	public boolean isFinished(String data) throws SQLException{
+	public long finishTaskByWunder(String data) throws SQLException, ParseException{
 		
 		String[] rows = data.split(";");
 		String[] columns;
@@ -338,8 +358,62 @@ public class DB {
 			Statement statement = connection.createStatement();
 	        ResultSet resultSet = statement.executeQuery(query);
 	        
-	        resultSet.next();
-	        status = resultSet.getString("status");
+	        while (resultSet.next()) {
+		        totalTime = resultSet.getInt("total_time");
+		        java.sql.Timestamp StartTimeStamp = resultSet.getTimestamp("start_time");
+		        status = resultSet.getString("status");
+		        
+		        
+		        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+				
+				Date date = format.parse(columns[3]);
+		        java.sql.Timestamp currentTimeStamp = new java.sql.Timestamp(date.getTime());
+		        
+		        System.out.println("finsihing time : " + currentTimeStamp);
+		        
+		        if(status.equals("start")){
+		        	totalTime += (currentTimeStamp.getTime() - StartTimeStamp.getTime());
+		        	java.sql.Timestamp updatedStamp = new java.sql.Timestamp(totalTime);
+		        }
+		        
+		        String updateQuery = "UPDATE fact SET status='finish', total_time=" + totalTime + ", start_time='" + currentTimeStamp + "' WHERE user=" + columns[0] + " AND list_id=" + columns[1] + " AND task_id=" + columns[2] + "";
+		        
+		        Statement updateStatement = connection.createStatement();
+				//ResultSet resultSet = statement.executeQuery(query);
+				updateStatement.executeUpdate(updateQuery);
+	        }
+			
+			
+		}
+		
+		status = "finish";
+		
+		return totalTime;
+	}
+	
+	
+	
+	public boolean isFinished(String data) throws SQLException{
+		
+		System.out.println("isfinished");
+		
+		String[] rows = data.split(";");
+		String[] columns;
+		String query = "", checkQuery = "";
+		long totalTime = 0;
+		
+		for(int i = 0; i < rows.length; i++){
+			
+			System.out.println("isF : row : " + rows[i]);
+			columns = rows[i].split(",");
+			query = "SELECT * FROM fact WHERE user=" + columns[0] + " AND list_id=" + columns[1] + " AND task_id=" + columns[2] + "";
+			
+			System.out.println("isF : query : " + query);
+			Statement statement = connection.createStatement();
+	        ResultSet resultSet = statement.executeQuery(query);
+	        
+	        if(resultSet.next())
+	        	status = resultSet.getString("status");
 	        
 	        if(status.equals("finish"))
 	        	return true;

@@ -29,6 +29,7 @@ access_token = (curl.testWunderlistAuthentication(code, client_id, client_secret
 <title>Time tracker</title>
 	<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
   	<link rel="stylesheet" href="css/timetracker.css">
+  	<link rel="stylesheet" href="css/stylesheet-image-based.css">
   	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
   	<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
   	<script src="js/timetrackingEvents.js"></script>
@@ -96,6 +97,14 @@ access_token = (curl.testWunderlistAuthentication(code, client_id, client_secret
 					  </ul>
 					</div>
 				</div>
+				<div class="example completed">
+			      <div>
+			        <input id="radio1" type="radio" name="taskcheck" value="1" checked="checked"><label for="radio1">Active</label>
+			      </div>
+			      <div>
+			        <input id="radio2" type="radio" name="taskcheck" value="2"><label for="radio2">Finished</label>
+			      </div>
+			    </div>
 				<div class="create-list">
 					<input type="text" placeholder="Create list"></input>
 					<button id="create-list" value="create">create</button>

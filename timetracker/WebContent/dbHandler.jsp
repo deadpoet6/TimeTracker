@@ -11,13 +11,16 @@
 	
     String action  = request.getParameter("action");
 	String data = request.getParameter("data");
+	//out.println("data in dbhandler : " + data );
 	
 	DB db = new DB();
 
 	if(action.equals("refresh"))
 	{
+		
+		
 		long time = db.refreshTime(data);
-		//out.println("status : " + db.status + " Time : " + db.getDurationBreakdown(time));
+		
 		
 		json.put("status", db.status);
 		json.put("time", db.getDurationBreakdown(time));

@@ -70,7 +70,9 @@ var wunderlistapi = function(access_token, client_id) {
 		}).success(function(data) {
 			
 			console.log(data);
-			loadTasks(data, list_id, completed);
+			
+			if(data.toString() != "")
+				loadTasks(data, list_id, completed);
 			
 		}).error(function(err) {
 			console.log(err);

@@ -56,8 +56,8 @@ $('document').ready(function(){
 	$('#accordion').on('click', 'input.finish', function(data){
 		
 		
-		$(this).parent().find('.start').button("enable");
-		$(this).parent().find('.pause').button("enable");
+		$(this).parent().find('.start').button("disable");
+		$(this).parent().find('.pause').button("disable");
 		$(this).parent().find('.finish').button("disable");
 		var task_id = $(this).parent().parent().attr("task-id");
 		var re_data = user_id + "," + list_id + "," + task_id + ";";
@@ -92,6 +92,10 @@ $('document').ready(function(){
 		//console.log($(this));
 		var task_id = $(this).parent().parent().attr('task-id');
 		wunapi.finishTask(task_id);
+	
+		
+		
+	
 		
 	});
 	
@@ -129,7 +133,18 @@ function loadTasks(data, list_id, completed){
 	
 	
 	$.each(data, function(key, val) {
-		dbRequest += "" + user_id + "," + list_id + "," + val.id + ";";
+		if(completed){
+			
+			var completed_at = val.completed_at.replace("T", " ");
+			completed_at = completed_at.replace("T", " ").replace("Z", "");
+			
+			//console.log("completed at : " + completed_at);
+			dbRequest += "" + user_id + "," + list_id + "," + val.id + "," + completed_at + ";";
+		
+		}else
+			dbRequest += "" + user_id + "," + list_id + "," + val.id + ";";
+			
+		
 		var task = val.title;
 		var info = "Information about task";
 		var created_at = val.created_at;
@@ -240,8 +255,8 @@ function refreshTask(data, task_id){
 		
 		if(json_res.status == "finish"){
 			
-			$('#accordion h3[aria-expanded="true"]').next().find('.start').button("enable");
-			$('#accordion h3[aria-expanded="true"]').next().find('.pause').button("enable");
+			$('#accordion h3[aria-expanded="true"]').next().find('.start').button("disable");
+			$('#accordion h3[aria-expanded="true"]').next().find('.pause').button("disable");
 			$('#accordion h3[aria-expanded="true"]').next().find('.finish').button("disable");
 			
 		}

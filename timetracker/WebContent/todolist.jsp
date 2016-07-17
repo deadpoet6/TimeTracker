@@ -43,7 +43,7 @@ access_token = (curl.testWunderlistAuthentication(code, client_id, client_secret
 	      var client_secret = '280d6aa72dcdd97099ecb3cedf4f6cb40ce93f181059d815619da348641c';
 	      var code = '<%= request.getParameter("code") %>';
 
-	      code="e3227046b919cf085c48";
+	      //code="e3227046b919cf085c48";
 	      
 	      init(access_token, client_id);
 	      
